@@ -3,7 +3,6 @@ The canny_edge IP is based on the work of Aadeetya Shreedhar and Alexander Wang
 https://github.com/ka367/Lane-Detecting-Using-Hough-Transform/blob/master/test.cpp
 */
 #include "canny_edge.h"
-//#include "LeNet.h"
 
 float expf(float x) {
  x = 1.0 + x / 1024;
@@ -165,7 +164,7 @@ void FullyConnLayer_6(float input[120],float *F6_value,float * weights){
 	}
 }
 
-//kernel 10x120 = 1200
+//kernel 10x84 = 840
 void FullyConnLayer_7(float input[84],float *F6_value,float * weights){
 	int i_y,i_x;
 	for(i_y = 0; i_y < 10; i_y++){
@@ -204,8 +203,10 @@ void canny_edge(wide_stream* in_stream, wide_stream* out_stream){
 #pragma HLS INTERFACE s_axilite port=return bundle=CONTROL_BUS clock=AXI_LITE_clk
 
 //#pragma HLS dataflow
-	const int packets = 62855;
-	float data[62855];
+	const int packets = 62494;
+	float data[62494];
+	int result;
+	float rout;
 
 	for(int r = 0; r < packets; r++){
 	#pragma HLS pipeline II=4
@@ -213,7 +214,7 @@ void canny_edge(wide_stream* in_stream, wide_stream* out_stream){
 		++in_stream;
 	}
 
-	int result;
+
 
 	// 32x32 iamge
 	float photo[1024];
@@ -221,8 +222,8 @@ void canny_edge(wide_stream* in_stream, wide_stream* out_stream){
 	//layer3 weights  5x5x6x16 = 25x6x16 =2400
 	//layer5 weights 400x120 = 48000
 	//layer6 weights 84x120 = 10080
-	//layer7 weights 10x120 = 1200
-//	float data[62855];
+	//layer7 weights 10x84 = 840
+
 	//The output of each layer
 	float C1_value[4704];
 	float A2_value[1176];
@@ -235,11 +236,10 @@ void canny_edge(wide_stream* in_stream, wide_stream* out_stream){
 	float probability[10];
 	float res[10];
 	int loop1_i;
-	//memory copy from BRAM to FPGA's RAM
-//	memcpy(data,(const float*)addrMaster,62855*sizeof(float));
+
 	//get the image data
 	for(loop1_i = 0; loop1_i<1024; loop1_i++){
-		photo[loop1_i] = data[loop1_i+61830];
+		photo[loop1_i] = data[loop1_i+61470];
 	}
 	//calulation of each layer
 	ConvLayer_1(photo,C1_value,data);
@@ -251,8 +251,10 @@ void canny_edge(wide_stream* in_stream, wide_stream* out_stream){
 	FullyConnLayer_7(F6_value,F7_value,data);
 	result = Softmax_1_8(F7_value,probability,res);
 
-	out_stream->data = result;
+	rout = result;
+
+	out_stream->data = rout;
 	out_stream->user = 1;
 	out_stream->last = 1;
-	++out_stream;
+
 }
