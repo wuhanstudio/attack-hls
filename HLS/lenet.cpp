@@ -1,8 +1,4 @@
-/*
-The canny_edge IP is based on the work of Aadeetya Shreedhar and Alexander Wang
-https://github.com/ka367/Lane-Detecting-Using-Hough-Transform/blob/master/test.cpp
-*/
-#include "canny_edge.h"
+#include "lenet.h"
 
 float expf(float x) {
  x = 1.0 + x / 1024;
@@ -196,7 +192,7 @@ int Softmax_1_8(float input[10],float *probability,float *res){
 	return max_index;
 }
 
-void canny_edge(wide_stream* in_stream, wide_stream* out_stream){
+void lenet(wide_stream* in_stream, wide_stream* out_stream){
 #pragma HLS INTERFACE axis port=in_stream bundle=INPUT
 #pragma HLS INTERFACE axis port=out_stream bundle=OUTPUT
 

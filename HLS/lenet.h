@@ -16,4 +16,4 @@ struct wide_stream {
 };
 
 
-void canny_edge(wide_stream* in_stream, wide_stream* out_stream);
+void lenet(wide_stream* in_stream, wide_stream* out_stream);
