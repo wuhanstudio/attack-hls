@@ -84,34 +84,34 @@ void AvgpoolLayer_2(float input[4704],float *A2_value){
 
 //kernel 5x5x6x16 = 25x6x16 =2400
 void ConvLayer_3(float input[1176],float *C3_value,float * weights){
-	int k_num,nk_num,i_y,i_x,matrix_x,matrix_y;
-	int mat_i;
+    int k_num,nk_num,i_y,i_x,matrix_x,matrix_y;
+    int mat_i;
     for(nk_num = 0; nk_num < 16; nk_num++){
-		for(i_y = 0; i_y < 10; i_y++){
-			for(i_x = 0; i_x < 10; i_x++){
-				float res = 0;
-				float res_total_6 = 0;
-				float matrix[25];
-				int index_now = i_x + i_y * 10 + nk_num * 100;
-				for(k_num = 0; k_num < 6; k_num++){
-					float matrix_2[25];
-					for(mat_i = 0;mat_i<25;mat_i++){
-						int weights_index = mat_i + k_num*25 + (nk_num+1)*150;
-						matrix_2[mat_i] = weights[weights_index];
+        for(i_y = 0; i_y < 10; i_y++){
+            for(i_x = 0; i_x < 10; i_x++){
+                float res_total_6 = 0;
+                float matrix[25];
+                int index_now = i_x + i_y * 14 + nk_num * 196;
+                int index_now_o = i_x + i_y * 10 + nk_num * 100;
+				for(matrix_y = 0; matrix_y <5; matrix_y++){
+					for(matrix_x = 0; matrix_x <5; matrix_x++){
+						int matrix_index = matrix_x + matrix_y * 5;
+						int input_value_index = index_now + matrix_x + matrix_y * 14;
+						matrix[matrix_index] = input[input_value_index];
 					}
-					for(matrix_y = 0; matrix_y <5; matrix_y++){
-						for(matrix_x = 0; matrix_x <5; matrix_x++){
-							int matrix_index = matrix_x + matrix_y * 5;
-							int input_value_index = index_now + matrix_x + matrix_y * 14;
-							matrix[matrix_index] = input[input_value_index];
-						}
-					}
-					res_total_6 += Conv_5x5(matrix,matrix_2);
 				}
-				C3_value[index_now] = res_total_6;
-			}
-		}
-	}
+                for(k_num = 0; k_num < 6; k_num++){
+                    float matrix_2[25];
+                    for(mat_i = 0;mat_i<25;mat_i++){
+                        int weights_index = mat_i + k_num*25 + (nk_num+1)*150;
+                        matrix_2[mat_i] = weights[weights_index];
+                    }
+                    res_total_6 += Conv_5x5(matrix,matrix_2);
+			    }
+                C3_value[index_now_o] = res_total_6;	
+            }
+        }
+    }
 }
 
 void AvgpoolLayer_4(float input[1600],float *A4_value){
